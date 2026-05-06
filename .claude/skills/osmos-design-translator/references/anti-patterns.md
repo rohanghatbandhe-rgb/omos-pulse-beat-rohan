@@ -122,6 +122,42 @@ Six generic-SaaS traps and four Osmos-specific traps. Each has the symptom, why 
 
 ---
 
+### 11. Novel Visualization Without a Legend
+
+**Symptom:** A custom data visualization (range bands, twin-track bars, sparkline-with-overlay, dot-and-whisker, heatmap, etc.) ships without an inline legend explaining what each visual layer means.
+
+**Why it's bad:** Standard chart conventions (line = trend, bar = magnitude, pie = composition) are pre-loaded in users' heads. Novel visualizations are not. A user looking at a four-layer band track for the first time has to reverse-engineer the encoding: *is the dark band current or ideal? what's the light band? what are the two tick marks?* They will guess wrong, lose trust, and dismiss the surface. Nielsen H6 (recognition over recall) is being violated for the sake of saving 15 vertical pixels.
+
+**Fix:** Above (or below) the first instance of the novel viz, render a one-line legend with **a swatch + label per visual layer**. For range bands: solid pill ("At your current budget") + dashed pill ("Forecast range at new budget") + tick mark icon ("Model's median"). The legend is part of the recipe — not an afterthought.
+
+**Osmos signal:** if the recipe uses a viz that isn't already in `component-recipes.md`, the recipe MUST include a `BandLegend`-style strip. No exceptions for "the bars are self-explanatory" — they're not.
+
+---
+
+### 12. Layout-Shift Reveal
+
+**Symptom:** Clicking a "Show more" / "Use my own number" / "Advanced options" button reveals new content that appears instantly, pushing every neighbor down/sideways. The wallet card just dropped 40px. The user lost their scroll position.
+
+**Why it's bad:** Doherty Threshold says interactions feel responsive under 400ms. Layout shift IS a response — but it's the wrong response. The eye tracks the jump as motion, the brain registers it as friction, the user pauses to re-orient. Cumulative Layout Shift (CLS) is also a Core Web Vital that Google penalizes for ranking. Beyond that: this is the canonical anti-delight beat — a moment that should feel additive (the user asked for the affordance) instead feels like the page broke.
+
+**Fix:** Reserve the vertical space for the to-be-revealed content via `min-height` on the parent (or use CSS Grid with implicit rows). Animate the reveal with a 150ms slide-in (`from { opacity: 0; transform: translateY(-4px) } to { opacity: 1; transform: translateY(0) }`). The neighbor doesn't move; the new content fades-and-slides into the reserved slot. Wrap in `prefers-reduced-motion` per the constraints file.
+
+**Osmos signal:** any `{conditional && <Block />}` that mounts/unmounts a chunk taller than 24px needs space reservation OR a slide-in animation. Both are better.
+
+---
+
+### 13. Quiet Trust Signal
+
+**Symptom:** The piece of information most relevant to the user's decision is rendered as the smallest, lowest-contrast type on the surface. The "78% confidence" chip on a forecast. The "based on 28 days of data" caveat under a recommendation. The "synced 2 minutes ago" indicator on a dashboard. The decision-pivot signal that the entire recipe is asking the user to trust — buried as a 10px muted gray afterthought.
+
+**Why it's bad:** Hick's Law penalises adding options at equal weight, but the inverse failure mode is also real: when the *most* decision-relevant signal is at *less* visual weight than peripheral chrome (the section title, the section icon, the breadcrumb), the user's eye never lands on it. They skip the signal that would have built trust, then later complain "I didn't know how confident the AI was." It was on the screen, but it wasn't designed to be read.
+
+**Fix:** Identify the trust pivot — the one piece of information that, if the user notices it, makes the rest of the recipe credible. Promote it to medium emphasis: 11px (not 10), `--osmos-brand-primary-muted` background instead of `--osmos-bg-subtle`, `--osmos-brand-primary` text instead of `--osmos-fg-muted`. Make it interactive (`:hover`/`:focus`) — give the user something to click to learn more. The chip should look like an affordance, not a footnote.
+
+**Osmos signal:** every Sofie suggestion has a confidence score. Every projection has a confidence interval. Every BYOT funnel stage has an attribution-quality flag. These are the trust pivots. They are NOT footnotes. Promote them.
+
+---
+
 ## How to use this file
 
 When checking a recipe at Phase 4:

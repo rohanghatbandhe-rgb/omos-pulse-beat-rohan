@@ -140,7 +140,58 @@ OsmosX may go up to 24/600 page title with 32-40 hero. Pulse never exceeds 20.
 
 ---
 
-## 10. The "B2B SaaS lookalike" risk
+## 11. Accessibility Floor — non-negotiable, every recipe
+
+A recipe that doesn't clear this floor isn't a recipe. It's a draft. WCAG 2.2 AA is the minimum bar; the lapses below were the ones that actually shipped past us in the past, so they're called out explicitly.
+
+### 11.1 Focus rings on every interactive — always
+
+Every `<button>`, radio, checkbox, custom-tab, and clickable card MUST have a visible `:focus-visible` ring. The Osmos default is `outline: 2px solid var(--osmos-brand-primary); outline-offset: 2px;` (segmented controls use `offset: -2px` to keep the ring inside the segment). If the recipe styles a button with `border: none`, the recipe MUST also include the focus-visible rule — `border: none` suppresses the browser default and produces an invisible focus state. **No silent suppression.**
+
+### 11.2 Keyboard navigation per ARIA APG — match the role
+
+If a recipe declares `role="radiogroup"`, it MUST implement arrow-key navigation per the ARIA Authoring Practices Guide: ArrowLeft/ArrowRight cycle selection, Home/End jump to first/last, selected radio gets `tabIndex={0}` while unselected siblings get `tabIndex={-1}` (roving tabindex). Same applies to `tablist`, `menu`, `listbox`, `tree`, `combobox`. **Declaring an ARIA role is a contract; the keyboard pattern that comes with the role is part of the contract.**
+
+### 11.3 Target size — WCAG 2.5.8 AA = 24×24, AAA = 44×44
+
+Every interactive element MUST be at least 24×24 CSS pixels. Default to 44×44 for primary CTAs, 32×32 for icon-only buttons, 24×24 for inline link-style buttons / chips / dismiss icons. **Wrap small icons in a button with padding** to expand the hit target — never set `padding: 0` on a button. The InfoIcon-as-clickable-13×13 mistake is the canonical example: it fails AA, fails Fitts's Law, fails motor-impaired users on touch.
+
+### 11.4 Color is never the only channel — WCAG 1.4.1
+
+If a recipe distinguishes two states via color (or color saturation, or opacity of the same hue) — that's color-only encoding. Add a second channel: pattern (dashed border, repeating-linear-gradient stripes), shape (circle vs square), label, or position. **The "ghost band vs solid band" mistake** (current vs ideal differentiated only by 0.18 opacity vs 1.0) is the canonical example: low-vision and CVD users can't tell which is which. Add dashed pattern to the ghost.
+
+### 11.5 Status messages — WCAG 4.1.3
+
+State changes the user can't see otherwise (form submission accepted, projection recomputed, item dismissed, undo countdown ticking) MUST be announced via either `role="status"` on the visible state element or a separate visually-hidden `aria-live="polite"` region. A celebratory green "Saved" pill that screen readers can't hear is a celebration only sighted users get.
+
+### 11.6 Reduced motion — WCAG 2.3.3 + parental respect
+
+Any animation longer than 150ms or distance greater than 8px MUST be wrapped in `@media (prefers-reduced-motion: no-preference)` OR `@media (prefers-reduced-motion: reduce) { .anim { transition: none !important; animation: none !important; } }`. Vestibular-disorder users get migraines from animations they didn't ask for. **Default-on motion is an accessibility violation.**
+
+### 11.7 Tooltips that don't lock out keyboard / screen-reader
+
+`title="..."` attributes are mouse-hover-only. They don't fire on keyboard focus. They are spotty in screen readers. If a tooltip carries information the user needs to make a decision (the confidence score's source, the "why this band" explanation), it MUST be reachable via either: (a) `aria-label` on the trigger that contains the same text, (b) a properly-coded popover that pairs `aria-describedby` with a focus-trapping panel, or (c) a click-revealed Drawer. **Do not put load-bearing copy in `title=`.**
+
+### 11.8 Contrast ratios — verify, don't trust
+
+Body text 4.5:1 against background. Large text (18+ or 14+ bold) 3:1. Non-text UI (button border, focus ring, status indicator) 3:1. The Osmos token system gets you most of the way for body text, but small (10–11px) chips on `--osmos-bg-subtle` are right at the edge in light mode and can fail in dark mode. **Use a contrast checker on every chip / pill / small-type ramp before declaring the recipe done.**
+
+### 11.9 Quick checklist (paste into the recipe's "Anti-patterns avoided" section)
+
+- [ ] `:focus-visible` on every button, radio, link
+- [ ] ARIA role → matching keyboard pattern
+- [ ] Hit target ≥ 24×24 for every clickable
+- [ ] Color always paired with a second channel
+- [ ] State changes announced via `role="status"` or `aria-live`
+- [ ] All animation respects `prefers-reduced-motion`
+- [ ] No load-bearing copy inside `title=`
+- [ ] Contrast verified at 4.5:1 / 3:1 thresholds
+
+If any item is "no", the recipe goes back to translation. This list is the difference between Honeycomb-Accessible C+ and B+.
+
+---
+
+## 12. The "B2B SaaS lookalike" risk
 
 What makes Osmos look like every other B2B SaaS — to actively avoid:
 

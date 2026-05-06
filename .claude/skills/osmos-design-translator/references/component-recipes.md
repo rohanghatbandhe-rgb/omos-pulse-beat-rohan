@@ -245,6 +245,114 @@ Card — var(--osmos-spacing-5) padding, var(--osmos-radii-xl) (12px), border 1p
 
 ---
 
+## Recipe 11: Range/Band Visualization (probabilistic forecast)
+
+**When:** Surfacing a model output that is fundamentally a confidence interval — forecasts, ML predictions, A/B test estimates, anything from DeepAR / XGBoost / Bayesian models. Single-point rendering of a band-output is dishonest to the model. The Funnel Predictor tech spec stores `confidence_score` per prediction; the Forecasting API returns `total` + `breakdown` per date with intrinsic uncertainty; the bid-range methodology explicitly computes `Lower bound`, `Upper bound`, `average` with gap-clamping. Render the band, not the point.
+
+```
+Layout: a single row per metric. Track 10–14px tall. Two band layers + two median ticks.
+
+Track (full width, 0 → axisMax = ideal.high)
+├── Ideal band (ghost)    — left = ideal.low%,    width = (100 - ideal.low%)%
+│                            visual: dashed pattern (NOT just opacity — WCAG 1.4.1)
+│                            CSS: repeating-linear-gradient(45deg, brand-primary 0 2px, transparent 2px 5px)
+│                            opacity 0.55 on the pattern itself
+├── Current band (solid)  — left = current.low%,  width = (current.high% - current.low%)%
+│                            background: var(--osmos-brand-primary)
+├── Ideal median tick     — at ideal.mid%; width 2px, top/bottom -2px (peeks above/below)
+│                            background: brand-primary, opacity 0.75
+└── Current median tick   — at current.mid%; width 2px, inside solid band (top/bottom +2px)
+                             background: var(--osmos-bg) (white sliver inside dark band)
+```
+
+**Mandatory companions:**
+1. **Inline legend strip** above the first band row — never assume the encoding is self-explanatory (anti-pattern 11):
+   - Solid pill swatch + label: "At your current budget"
+   - Dashed pill swatch + label: "Forecast range at new budget"
+   - Vertical tick icon + label: "Model's median"
+2. **Range labels** on each row showing both `low – high` not the median alone:
+   - `now {fmt(current.low)}–{fmt(current.high)}` in 11px subtle
+   - `{fmt(ideal.low)}–{fmt(ideal.high)}` in 13–15px bold
+3. **Delta-as-range pill**: `+{fmt(deltaLow)}–{fmt(deltaHigh)} unlocked` — never collapse to a single number; the lower-bound delta = `ideal.low - current.high` (worst-case unlock), upper-bound delta = `ideal.high - current.low` (best-case).
+4. **Confidence chip in the section header** (sibling to the section title): `{N}% confidence` rendered as a clickable button with `--osmos-brand-primary-muted` background + `--osmos-brand-primary` text — NOT 10px muted gray (anti-pattern 13). The chip is the trust pivot; treat it like one.
+
+**Animation:** band edges (`left`, `width`) transition `280ms cubic-bezier(0.16, 1, 0.3, 1)` so a tier change visibly grows/shrinks the bands instead of teleporting. Wrap in `prefers-reduced-motion` per Accessibility Floor §11.6.
+
+**States:**
+- **Default**: confidence ≥ 0.75 → render full band recipe
+- **Wide-band warning**: confidence 0.40–0.60 → render with a 12px caption above first row "Limited history — bands wider than typical" + amber tint on the confidence chip
+- **Insufficient confidence**: < 0.40 → DON'T render this recipe; hand off to Learning Mode (Recipe 1 variant with criteria checklist)
+- **Loading**: skeleton bars (animated linear-gradient shimmer 1500ms) on each row; numbers replaced with `••• – •••` placeholder
+- **Error (model unavailable)**: inline alert + Retry button + fallback to a flat "Estimated revenue uplift unknown — your budget is fine to proceed"
+
+**Don't:**
+- Distinguish current vs ideal by opacity alone (WCAG 1.4.1 violation — use pattern)
+- Show only the median ("8.2M revenue") — that's a point, not the model output
+- Tooltip only on the tick (Fitts violation — 2px target). Tooltip on the whole row.
+- Bury the confidence number as 10px muted text (anti-pattern 13)
+
+**Judgment call:** how much horizontal space the ghost band occupies. Default: ghost extends from `ideal.low` to `ideal.high = axisMax` (right edge). If ideal.high is dramatically larger than current.high, the solid current band can shrink to 5–10% of track width, looking visually weak. Cap the axis at `1.2 × ideal.high` to give breathing room and re-anchor current band visibility.
+
+**Anchored to:** Funnel Predictor `confidence_score`; Forecasting API breakdown response; bid-range methodology Lower/Upper/average; DeepAR probabilistic output. Do not ship a forecast surface without this recipe (or Learning Mode).
+
+---
+
+## Recipe 12: Reveal-on-Action (chips, expanders, helper rows)
+
+**When:** A button click reveals supplementary affordances (rejection-reason chips, advanced-filter rows, "tell me more" panels, contextual help) below or beside the trigger. Anywhere `{condition && <Block />}` would mount a non-trivial chunk.
+
+**Why this needs a recipe:** the naive implementation (mount the chunk on click) causes a layout shift — the new content pushes neighbors down or sideways, the user loses their place, the moment that should feel additive feels broken. This is anti-pattern 12 (Layout-Shift Reveal).
+
+```
+Parent container
+├── Always-rendered trigger row (button + siblings)
+└── Reserved slot
+    ├── default: empty space at min-height equal to expected revealed height (or use grid implicit row)
+    └── revealed: the chunk, animated in via 150ms slide-in keyframe
+```
+
+**Implementation:**
+
+```css
+@keyframes revealSlideIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal-row { animation: revealSlideIn 150ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal-row { animation: none; }
+}
+```
+
+```jsx
+<div style={{ minHeight: revealed ? undefined : RESERVED_HEIGHT_PX }}>
+  <TriggerRow>...</TriggerRow>
+  {revealed && (
+    <div className="reveal-row" id="...">
+      ...content...
+    </div>
+  )}
+</div>
+```
+
+**Mandatory:**
+- Trigger button gets `aria-expanded={revealed}` + `aria-controls={revealId}`
+- Revealed block gets `id={revealId}` matching the trigger's `aria-controls`
+- Space reservation via `min-height` OR grid implicit row — never let neighbors move
+- 150ms slide-in animation, reduced-motion guard
+- Keyboard: trigger MUST be focusable, revealed buttons inside MUST be in tab order
+
+**Don't:**
+- Open the reveal in a modal (overkill for ≤4 chips / ≤200px content)
+- Toggle visibility with no animation (jarring)
+- Push the trigger button itself when content reveals beside it (use horizontal grid)
+
+**Judgment call:** when to use space-reservation vs animated-slot vs popover. Reservation is best for predictable-height reveals (chip rows, single line of text). Animated slot (height 0 → auto via grid `transition-property: grid-template-rows`) for variable-height. Popover for >300px content or anything that would push the page substantially. **Pick one per surface, stick to it.**
+
+**Anchored to:** Doherty Threshold (interactions feel responsive under 400ms); Cumulative Layout Shift Core Web Vital; Nielsen H1 (visibility of system status — animation IS the status feedback).
+
+---
+
 ## How to use these recipes
 
 These are starting points, not laws. When the user's brief calls for a recipe:
