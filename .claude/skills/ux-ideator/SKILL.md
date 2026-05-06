@@ -174,6 +174,16 @@ Append `prd` node (with Meera reframe appended) to `graphify-out/ux-ideator/[fea
 
 **Before starting:** Noor reads `references/noor.md` + `references/noor-knowledge.md`. Dev reads `references/dev.md`. Arjun reads `../design-critic/references/arjun.md`.
 
+**Pre-phase pattern check — read before proposing any screen:**
+
+Read `obsidian-vault/Patterns/control-center-standard.md` if it exists. This registry documents established UI patterns across the portal:
+- Which screen types already exist and what their IA looks like
+- Which components (atoms, molecules) are available and proven in context
+- Which patterns are canonical (don't re-invent) vs. still open
+- Which T4 exceptions exist (domain-specific deviations that are intentional)
+
+Noor's IA decisions must account for what already exists. If a proposed screen type matches an existing pattern, reuse it — don't propose a parallel pattern that will create drift. If a proposed screen genuinely needs a new pattern, name it explicitly and add it to the registry at the end of Phase 2.
+
 Noor leads. Dev audits for power-user gaps (bulk actions, keyboard paths, dead-ends). **Arjun audits for research-grounded UX gaps** — specifically: does the IA serve the actual workflow patterns in research data (Sofie 343 feedback, 143 debug tickets, Campaign Not Spending SOP), or does it serve an idealized user that doesn't exist? Arjun produces a short "research-flagged risks" list under Dev's audit flags. Raj only speaks if stalemate criteria are met (2+ structural objections that Noor won't concede).
 
 ### IA Map Output Format
@@ -237,6 +247,16 @@ Check `references/ia-patterns.md §5` before proposing any new nav item. New scr
 **Before starting:** Noor re-consults `references/noor.md` §"IA Patterns That Work" before writing Concept A. Dev re-consults `references/dev.md` §"Ad Ops Workflows" and §"Density Benchmarks" before writing Concept B.
 
 **NO Figma at this phase.** Lo-fi is text/ASCII only. Figma is called in Phase 6. The goal here is layout intent and component decisions — not pixels.
+
+**Pattern registry check before wireframing:**
+
+Both Noor and Dev must check `obsidian-vault/Patterns/control-center-standard.md` before producing their concepts. Specifically:
+- Use the exact table header/row style values from Pattern 1 — don't re-derive them
+- Use the exact atoms/molecules listed in the inventory — don't propose custom components if a library component exists
+- Reference established drawer sizes (560px standard, 700px wide) rather than picking new widths
+- If either concept requires a pattern NOT in the registry, flag it explicitly as a "new pattern proposal" in their concept text
+
+This ensures Phase 3 outputs are directly implementable (the visual recipe in Phase 3.5 won't contradict established patterns) and that every new page shipped adds to — not diverges from — the portal's design language.
 
 Noor produces **Concept A**. Dev produces **Concept B**. Each is written entirely in that agent's voice. They do not appear in each other's sections.
 

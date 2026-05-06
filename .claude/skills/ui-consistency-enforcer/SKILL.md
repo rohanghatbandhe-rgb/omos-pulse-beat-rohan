@@ -121,6 +121,8 @@ These values are the single source of truth. Every page in Pulse Control Center 
 
 ## Phase 0 — Identify scope
 
+**Before scanning any files, read `obsidian-vault/Patterns/control-center-standard.md`** to load the current canonical standard. The Standard tables in this skill file are the source of truth, but the Obsidian registry may contain newer T4 exceptions or component additions discovered in recent runs. Merge any additions into your working standard before proceeding.
+
 Parse arguments. Default scope: all `.jsx` files in `src/retailer/components/` that contain an HTML `<table>` or `<Table` element (i.e. are data pages, not utility components or helpers).
 
 Exclude:
@@ -216,3 +218,23 @@ Must show `✓ built in` with 0 errors.
 After this skill completes, the following should also be run if not done recently:
 - **`token-enforcer`** — catches any remaining hardcoded hex values this skill didn't touch
 - **`component-reuse-enforcer`** — catches locally-defined StatusBadge/TypeBadge functions this skill's T2 pass may have missed
+
+---
+
+## Obsidian Pattern Registry Integration
+
+After every consistency pass (whether fixes were applied or audit-only), update the pattern registry at `obsidian-vault/Patterns/control-center-standard.md`.
+
+**What to update:**
+- `last-updated` frontmatter field → today's date (ISO format)
+- `updated-by` → `ui-consistency-enforcer`
+- If any T4 exceptions were newly discovered → add them to the "T4 — Known exceptions" table
+- If any new component was promoted from inline to library usage → update the Atoms/Molecules inventory tables
+- If a new page was fixed → add it to the "Used by:" list under the relevant pattern
+
+**What NOT to overwrite:**
+- The Standard values tables (those are the source of truth, only change via deliberate team decision)
+- The wikilink structure ([[Pages/X]], [[Components/X]])
+- The T4 exceptions already documented
+
+The pattern registry is the handoff point to ux-ideator. Keep it accurate so every new screen starts from current knowledge, not from scratch.
