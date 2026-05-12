@@ -68,6 +68,9 @@ const NAV_SECTIONS = [
       </>
     ),
     subnav: [
+      // ── Campaign Review
+      { id: 'campaign-review-header',          label: 'Campaign Management',                      group: 'Campaign Management', isGroupHeader: true },
+      { id: 'campaign-review',               label: 'Campaign Review',                          group: 'Campaign Management' },
       // ── Merchant Management (top-level direct link, no group)
       { id: 'merchant-management',           label: 'Merchant Management' },
       // ── Product catalog Management (top-level direct link, no group)
