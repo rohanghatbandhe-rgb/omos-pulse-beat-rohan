@@ -68,6 +68,9 @@ const NAV_SECTIONS = [
       </>
     ),
     subnav: [
+      // ── Campaign Management
+      { id: 'campaign-review-header',        label: 'Campaign Management',                      group: 'Campaign Management', isGroupHeader: true },
+      { id: 'campaign-review',               label: 'Campaign Review',                          group: 'Campaign Management' },
       // ── Advertiser Management
       { id: 'advertisers',                   label: 'Advertisers',                              group: 'Advertiser Management' },
       { id: 'persona-config',                label: 'Persona Configuration',                    group: 'Advertiser Management' },

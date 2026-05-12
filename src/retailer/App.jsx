@@ -63,6 +63,7 @@ import DisplayAdsInventoryMgmtPage from './components/DisplayAdsInventoryMgmtPag
 import DevelopSettingsPage from './components/DevelopSettingsPage';
 import SetupDetailsPage from './components/SetupDetailsPage';
 import BYOTAdminConfigPage from './components/BYOTAdminConfigPage';
+import CampaignReviewPage from './components/CampaignReviewPage';
 
 /* ── Analytics dashboard (the original page) ─────────────────── */
 function AnalyticsDashboard({ bare = false }) {
@@ -598,6 +599,15 @@ export default function App() {
             <TopBar section="BYOT" page="Configuration" onNavigate={setActivePage} />
             <main style={{ flex: 1, overflowY: 'auto', background: 'var(--osmos-bg-subtle)' }}>
               <BYOTAdminConfigPage />
+            </main>
+          </>
+        );
+      case 'campaign-review':
+        return (
+          <>
+            <TopBar section="Control Center" page="Campaign Review" onNavigate={setActivePage} />
+            <main style={{ flex: 1, overflowY: 'auto', background: 'var(--osmos-bg)' }}>
+              <CampaignReviewPage />
             </main>
           </>
         );
