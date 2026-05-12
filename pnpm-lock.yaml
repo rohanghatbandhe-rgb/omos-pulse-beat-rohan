@@ -50,6 +50,9 @@ importers:
       lucide-react:
         specifier: ^1.14.0
         version: 1.14.0(react@19.2.4)
+      react-icons:
+        specifier: ^5.6.0
+        version: 5.6.0(react@19.2.4)
       recharts:
         specifier: ^3.8.1
         version: 3.8.1(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1)
@@ -1698,6 +1701,11 @@ packages:
 
   react-icons@5.5.0:
     resolution: {integrity: sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==}
+    peerDependencies:
+      react: '*'
+
+  react-icons@5.6.0:
+    resolution: {integrity: sha512-RH93p5ki6LfOiIt0UtDyNg/cee+HLVR6cHHtW3wALfo+eOHTp8RnU2kRkI6E+H19zMIs03DyxUG/GfZMOGvmiA==}
     peerDependencies:
       react: '*'
 
@@ -3810,6 +3818,10 @@ snapshots:
       scheduler: 0.27.0
 
   react-icons@5.5.0(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+
+  react-icons@5.6.0(react@19.2.4):
     dependencies:
       react: 19.2.4
 

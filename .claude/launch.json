@@ -9,6 +9,24 @@
       "env": {
         "PATH": "/Users/rohan.ghatbandhe/.nvm/versions/node/v20.19.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
       }
+    },
+    {
+      "name": "Landing (index.html)",
+      "runtimeExecutable": "/opt/homebrew/bin/pnpm",
+      "runtimeArgs": ["dev", "--port", "5173"],
+      "port": 5173
+    },
+    {
+      "name": "Retailer Console (retailer.html)",
+      "runtimeExecutable": "/opt/homebrew/bin/pnpm",
+      "runtimeArgs": ["dev:retailer", "--port", "5173"],
+      "port": 5173
+    },
+    {
+      "name": "Advertiser Console (advertiser.html)",
+      "runtimeExecutable": "/opt/homebrew/bin/pnpm",
+      "runtimeArgs": ["dev:advertiser", "--port", "5173"],
+      "port": 5173
     }
   ]
 }

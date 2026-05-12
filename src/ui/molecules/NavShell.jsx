@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { Icon, ChevronRightIcon } from '../atoms/Icon';
+import {
+  LuChevronRight,
+  LuChevronUp,
+} from 'react-icons/lu';
 
 /**
  * NavShell — shared left-nav chrome for all Osmos portals.
@@ -9,6 +12,10 @@ import { Icon, ChevronRightIcon } from '../atoms/Icon';
  *     hasSub?,      // true → renders a › chevron, caller handles via subnavPanel prop
  *     subItems?     // [{ id, label, icon?, active, onClick }] → inline expand inside rail
  *   }
+ *
+ * ⚠️  icon must now be a React component reference (not a JSX element / SVG fragment).
+ *      Example: import { LuRocket } from 'react-icons/lu'; → { icon: LuRocket }
+ *      Or use any component from @icons/index (os-icons-v2 brand set).
  *
  * Props:
  *   items         Item[]
@@ -82,8 +89,10 @@ export function NavShell({
           gap: 10,
           borderBottom: '1px solid var(--osmos-nav-border)',
         }}>
-          {/* Mark — always visible */}
-          {logoMark}
+          {/* Mark — always visible; clicking navigates to landing */}
+          <a href="/" style={{ display: 'flex', flexShrink: 0, cursor: 'pointer' }}>
+            {logoMark}
+          </a>
 
           {/* Wordmark + badge — only when expanded */}
           {wide && logoText && (
@@ -176,6 +185,13 @@ export function NavShell({
   );
 }
 
+// ── NavIcon helper ────────────────────────────────────────────────────────────
+// Renders a react-icons / os-icons-v2 component reference with size + color.
+function NavIcon({ icon: Ic, size, color }) {
+  if (!Ic) return null;
+  return <Ic size={size} color={color} />;
+}
+
 // ── NavRailItem ───────────────────────────────────────────────────────────────
 function NavRailItem({ item, active, wide, isOpen, onClick, muted = false }) {
   const [hover, setHover] = useState(false);
@@ -192,10 +208,7 @@ function NavRailItem({ item, active, wide, isOpen, onClick, muted = false }) {
     ? 'var(--osmos-nav-active-bg)'
     : hover ? 'rgba(255,255,255,0.08)' : 'transparent';
 
-  // Chevron: up when open (inline expand), right when closed / has side panel
-  const chevronPaths = isOpen
-    ? <path d="m18 15-6-6-6 6" />       // chevron-up
-    : <polyline points="9 18 15 12 9 6"/>; // chevron-right
+  const ChevronIcon = isOpen ? LuChevronUp : LuChevronRight;
 
   return (
     <>
@@ -222,7 +235,7 @@ function NavRailItem({ item, active, wide, isOpen, onClick, muted = false }) {
       >
         {/* Icon — always left-pinned, never centred. size=20 matches nav density. */}
         <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-          <Icon size={20} color={iconColor}>{item.icon}</Icon>
+          <NavIcon icon={item.icon} size={20} color={iconColor} />
         </div>
 
         {/* Label + badge + chevron — visible only when wide */}
@@ -248,12 +261,10 @@ function NavRailItem({ item, active, wide, isOpen, onClick, muted = false }) {
             )}
 
             {(item.hasSub || item.subItems?.length > 0) && (
-              <Icon
+              <ChevronIcon
                 size={13}
                 color={active ? 'var(--osmos-nav-accent)' : 'rgba(255,255,255,0.3)'}
-              >
-                {chevronPaths}
-              </Icon>
+              />
             )}
           </>
         )}
@@ -282,7 +293,7 @@ function SubRailItem({ item, onClick }) {
     >
       {item.icon && (
         <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-          <Icon size={18} color={color}>{item.icon}</Icon>
+          <NavIcon icon={item.icon} size={18} color={color} />
         </div>
       )}
       <span style={{ fontSize: 13, fontWeight: item.active ? 600 : 400, color }}>

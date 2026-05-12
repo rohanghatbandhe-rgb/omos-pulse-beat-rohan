@@ -13,6 +13,8 @@ export default defineConfig({
       // imports for `components/`, `lib/`, etc. Map `@/` to `src/advertiser/` so those
       // imports resolve without rewriting every file.
       '@': resolve(__dirname, 'src/advertiser'),
+      // Custom brand icon set — src/icons/index.js exports 539 icons from os-icons-v2
+      '@icons': resolve(__dirname, 'src/icons'),
     },
     // Force a single React instance across the app and all packages (including the
     // design system's CJS require("react")). Without this, pnpm's per-worktree
